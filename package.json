@@ -1,12 +1,6 @@
 {
-	"name": "sony-bravia",
-	"version": "2.0.2",
-	"api_version": "1.0.0",
-	"keywords": ["TV"],
-	"manufacturer": "Sony",
-	"product": "Bravia",
-	"shortname": "sony-bravia",
-	"description": "",
+	"name": "tinkerlist-cuez-automator",
+	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
 		"format": "prettier -w .",
@@ -14,7 +8,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/bitfocus/companion-module-sony-bravia.git"
+		"url": "git+https://github.com/bitfocus/companion-module-tinkerlist-cuez-automator.git"
 	},
 	"license": "MIT",
 	"prettier": "@companion-module/tools/.prettierrc.json",

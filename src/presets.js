@@ -12,153 +12,13 @@ module.exports = {
 		const backgroundColorGreen = combineRgb(0, 255, 0) // Green
 		const backgroundColorYellow = combineRgb(255, 255, 0) // Yellow
 
-		presets['power_on'] = {
-			category: 'Power',
-			name: `Power On`,
+		presets['next'] = {
+			category: 'Navigation',
+			name: `Next`,
 			type: 'button',
 			style: {
-				text: 'Power On',
-				size: '18',
-				color: foregroundColor,
-				bgcolor: foregroundColorBlack,
-			},
-			feedbacks: [
-				{
-					feedbackId: 'powerStatus',
-					style: {
-						bgcolor: backgroundColorYellow,
-						color: foregroundColorBlack,
-					},
-					options: {
-						state: true,
-					},
-				},
-			],
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'power_on',
-							options: {},
-						},
-					],
-					up: [],
-				},
-			],
-		}
-
-		presets['power_off'] = {
-			category: 'Power',
-			name: `Power Off`,
-			type: 'button',
-			style: {
-				text: 'Power Off',
-				size: '18',
-				color: foregroundColor,
-				bgcolor: foregroundColorBlack,
-			},
-			feedbacks: [
-				{
-					feedbackId: 'powerStatus',
-					style: {
-						bgcolor: backgroundColorYellow,
-						color: foregroundColorBlack,
-					},
-					options: {
-						state: false,
-					},
-				},
-			],
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'power_off',
-							options: {},
-						},
-					],
-					up: [],
-				},
-			],
-		}
-
-		presets['volume_mute'] = {
-			category: 'Volume',
-			name: `Mute`,
-			type: 'button',
-			style: {
-				text: 'Mute',
-				size: '18',
-				color: foregroundColor,
-				bgcolor: foregroundColorBlack,
-			},
-			feedbacks: [
-				{
-					feedbackId: 'muteStatus',
-					style: {
-						bgcolor: backgroundColorYellow,
-						color: foregroundColorBlack,
-					},
-					options: {
-						state: true,
-					},
-				},
-			],
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'volume_mute',
-							options: {},
-						},
-					],
-					up: [],
-				},
-			],
-		}
-
-		presets['volume_unmute'] = {
-			category: 'Volume',
-			name: `Unmute`,
-			type: 'button',
-			style: {
-				text: 'Unmute',
-				size: '18',
-				color: foregroundColor,
-				bgcolor: foregroundColorBlack,
-			},
-			feedbacks: [
-				{
-					feedbackId: 'muteStatus',
-					style: {
-						bgcolor: backgroundColorYellow,
-						color: foregroundColorBlack,
-					},
-					options: {
-						state: false,
-					},
-				},
-			],
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'volume_unmute',
-							options: {},
-						},
-					],
-					up: [],
-				},
-			],
-		}
-
-		presets['volume_up'] = {
-			category: 'Volume',
-			name: `Volume Up`,
-			type: 'button',
-			style: {
-				text: 'Volume Up',
-				size: '18',
+				text: 'Next',
+				size: '14',
 				color: foregroundColor,
 				bgcolor: foregroundColorBlack,
 			},
@@ -167,7 +27,7 @@ module.exports = {
 				{
 					down: [
 						{
-							actionId: 'volume_up',
+							actionId: 'next',
 							options: {},
 						},
 					],
@@ -176,13 +36,13 @@ module.exports = {
 			],
 		}
 
-		presets['volume_down'] = {
-			category: 'Volume',
-			name: `Volume Down`,
+		presets['previous'] = {
+			category: 'Navigation',
+			name: `Previous`,
 			type: 'button',
 			style: {
-				text: 'Volume Down',
-				size: '18',
+				text: 'Previous',
+				size: '14',
 				color: foregroundColor,
 				bgcolor: foregroundColorBlack,
 			},
@@ -191,7 +51,7 @@ module.exports = {
 				{
 					down: [
 						{
-							actionId: 'volume_down',
+							actionId: 'previous',
 							options: {},
 						},
 					],
@@ -200,35 +60,148 @@ module.exports = {
 			],
 		}
 
-		for (const input of this.CHOICES_INPUTS) {
-			presets[`select_source_${input.label}`] = {
-				category: 'Source',
-				name: `Select source ${input.label}`,
+		presets['next_trigger'] = {
+			category: 'Navigation',
+			name: `Next Trigger`,
+			type: 'button',
+			style: {
+				text: 'Next Trigger',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'next_trigger',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
+		presets['previous_trigger'] = {
+			category: 'Navigation',
+			name: `Previous Trigger`,
+			type: 'button',
+			style: {
+				text: 'Previous Trigger',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'previous_trigger',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
+		// TODO(Peter): Retest on later automator
+		/*for (const macro of this.CHOICES_MACROS) {
+			presets[`fire_macro_${macro.label}`] = {
+				category: 'Macros',
+				name: `Fire Macro ${macro.label}`,
 				type: 'button',
 				style: {
-					text: input.label,
-					size: '18',
+					text: `Fire Macro ${macro.label}`,
+					size: '14',
 					color: foregroundColor,
 					bgcolor: foregroundColorBlack,
 				},
 				feedbacks: [
-					{
-						feedbackId: 'currentInput',
-						style: {
-							bgcolor: backgroundColorYellow,
-							color: foregroundColorBlack,
-						},
-						options: {
-							input: input.id,
-						},
-					},
 				],
 				steps: [
 					{
 						down: [
 							{
-								actionId: 'change_external_input',
-								options: self.parseDeviceResourceURI(input.id),
+								actionId: 'fire_macro',
+								options: {macro: macro.id},
+							},
+						],
+						up: [],
+					},
+				],
+			}
+		}*/
+
+		presets['stop_all_timers'] = {
+			category: 'Timers',
+			name: `Stop All Timers`,
+			type: 'button',
+			style: {
+				text: 'Stop All Timers',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'stop_all_timers',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
+		for (const timer of this.CHOICES_TIMERS) {
+			presets[`start_timer_${timer.label}`] = {
+				category: 'Timers',
+				name: `Start Timer ${timer.label}`,
+				type: 'button',
+				style: {
+					text: `Start Timer ${timer.label}`,
+					size: '14',
+					color: foregroundColor,
+					bgcolor: foregroundColorBlack,
+				},
+				feedbacks: [],
+				steps: [
+					{
+						down: [
+							{
+								actionId: 'start_timer',
+								options: { timer: timer.id },
+							},
+						],
+						up: [],
+					},
+				],
+			}
+
+			presets[`stop_timer_${timer.label}`] = {
+				category: 'Timers',
+				name: `Stop Timer ${timer.label}`,
+				type: 'button',
+				style: {
+					text: `Stop Timer ${timer.label}`,
+					size: '14',
+					color: foregroundColor,
+					bgcolor: foregroundColorBlack,
+				},
+				feedbacks: [],
+				steps: [
+					{
+						down: [
+							{
+								actionId: 'stop_timer',
+								options: { timer: timer.id },
 							},
 						],
 						up: [],

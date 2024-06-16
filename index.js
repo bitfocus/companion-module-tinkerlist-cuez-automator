@@ -1,4 +1,4 @@
-// Sony-Bravia
+// TinkerList-Cuez-Automator
 
 const { InstanceBase, InstanceStatus, runEntrypoint } = require('@companion-module/base')
 const UpgradeScripts = require('./src/upgrades')
@@ -11,7 +11,7 @@ const presets = require('./src/presets')
 
 const api = require('./src/api')
 
-class braviaInstance extends InstanceBase {
+class cuezAutomatorInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
 
@@ -28,19 +28,17 @@ class braviaInstance extends InstanceBase {
 		this.INTERVAL = null //used to poll for updates
 
 		this.DATA = {
-			powerState: false,
-			volumeLevel: 0,
-			muteState: false,
-			input: '',
-			inputs: [],
+			buttons: [],
+			shortcuts: [],
+			macros: [],
+			timers: [],
 		}
 
-		this.CHOICES_INPUTS = [
-			{ id: 'extInput:component?port=1', label: 'Component 1' },
-			{ id: 'extInput:component?port=2', label: 'Component 2' },
-			{ id: 'extInput:hdmi?port=1', label: 'HDMI 1' },
-			{ id: 'extInput:hdmi?port=2', label: 'HDMI 2' },
-		]
+		this.CHOICES_DECK_BUTTONS = []
+		this.CHOICES_DECK_SWITCHES = []
+		this.CHOICES_SHORTCUTS = []
+		this.CHOICES_MACROS = []
+		this.CHOICES_TIMERS = []
 	}
 
 	async destroy() {
@@ -75,4 +73,4 @@ class braviaInstance extends InstanceBase {
 	}
 }
 
-runEntrypoint(braviaInstance, UpgradeScripts)
+runEntrypoint(cuezAutomatorInstance, UpgradeScripts)

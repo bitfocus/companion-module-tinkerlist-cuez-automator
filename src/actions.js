@@ -3,93 +3,180 @@ module.exports = {
 		let self = this
 		let actions = {}
 
-		actions.power_on = {
-			name: 'Power On',
+		actions.next = {
+			name: 'Next',
 			options: [],
 			callback: async function (action) {
-				let params = { status: true }
-				self.sendCommand('system', 'setPowerStatus', params)
+				self.sendCommand('trigger', 'next')
 			},
 		}
 
-		actions.power_off = {
-			name: 'Power Off',
+		actions.previous = {
+			name: 'Previous',
 			options: [],
 			callback: async function (action) {
-				let params = { status: false }
-				self.sendCommand('system', 'setPowerStatus', params)
+				self.sendCommand('trigger', 'previous')
 			},
 		}
 
-		actions.volume_up = {
-			name: 'Volume Up',
+		actions.next_trigger = {
+			name: 'Next Trigger',
 			options: [],
 			callback: async function (action) {
-				let params = { target: 'speaker', volume: '+1' }
-				self.sendCommand('audio', 'setAudioVolume', params)
+				self.sendCommand('trigger', 'nextTrigger')
 			},
 		}
 
-		actions.volume_down = {
-			name: 'Volume Down',
+		actions.previous_trigger = {
+			name: 'Previous Trigger',
 			options: [],
 			callback: async function (action) {
-				let params = { target: 'speaker', volume: '-1' }
-				self.sendCommand('audio', 'setAudioVolume', params)
+				self.sendCommand('trigger', 'previous')
 			},
 		}
 
-		actions.volume_mute = {
-			name: 'Volume Mute',
-			options: [],
-			callback: async function (action) {
-				let params = { status: true }
-				self.sendCommand('audio', 'setAudioMute', params)
-			},
-		}
-
-		actions.volume_unmute = {
-			name: 'Volume Unmute',
-			options: [],
-			callback: async function (action) {
-				let params = { status: false }
-				self.sendCommand('audio', 'setAudioMute', params)
-			},
-		}
-
-		actions.change_external_input = {
-			name: 'Change External Input',
+		actions.trigger_deck_button = {
+			name: 'Trigger Deck Button',
 			options: [
 				{
 					type: 'dropdown',
-					label: 'Kind',
-					id: 'kind',
-					choices: [
-						{ id: 'hdmi', label: 'HDMI' },
-						// TODO(Someone): Add CEC, but the URI has a type and port is optional
-						{ id: 'component', label: 'Component' },
-						{ id: 'composite', label: 'Composite' },
-						{ id: 'scart', label: 'SCART' },
-						{ id: 'widi', label: 'Wi-Fi Display' },
-					],
-				},
-				{
-					type: 'dropdown',
-					label: 'Port',
-					id: 'port',
-					choices: [
-						{ id: '1', label: '1' },
-						{ id: '2', label: '2' },
-						{ id: '3', label: '3' },
-						{ id: '4', label: '4' },
-					],
+					label: 'Button',
+					id: 'button',
+					choices: self.CHOICES_DECK_BUTTONS,
+					default: self.CHOICES_DECK_BUTTONS.length > 0 ? self.CHOICES_DECK_BUTTONS[0].id : '',
 				},
 			],
 			callback: async function (action) {
 				let opt = action.options
-				let uri = 'extInput:' + opt.kind + '?port=' + opt.port
-				let params = { uri: uri }
-				self.sendCommand('avContent', 'setPlayContent', params)
+				self.sendCommand('trigger', 'button', opt.button)
+			},
+		}
+
+		actions.trigger_deck_switch_on = {
+			name: 'Trigger Deck Switch On',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Switch',
+					id: 'switch',
+					choices: self.CHOICES_DECK_SWITCHES,
+					default: self.CHOICES_DECK_SWITCHES.length > 0 ? self.CHOICES_DECK_SWITCHES[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('trigger', 'button', opt.switch, 'on')
+			},
+		}
+
+		actions.trigger_deck_switch_off = {
+			name: 'Trigger Deck Switch Off',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Switch',
+					id: 'switch',
+					choices: self.CHOICES_DECK_SWITCHES,
+					default: self.CHOICES_DECK_SWITCHES.length > 0 ? self.CHOICES_DECK_SWITCHES[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('trigger', 'button', opt.switch, 'off')
+			},
+		}
+
+		actions.trigger_deck_switch_click = {
+			name: 'Trigger Deck Switch Click',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Switch',
+					id: 'switch',
+					choices: self.CHOICES_DECK_SWITCHES,
+					default: self.CHOICES_DECK_SWITCHES.length > 0 ? self.CHOICES_DECK_SWITCHES[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('trigger', 'button', opt.switch, 'click')
+			},
+		}
+
+		actions.trigger_shortcut = {
+			name: 'Trigger Shortcut',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Shortcut',
+					id: 'shortcut',
+					choices: self.CHOICES_SHORTCUTS,
+					default: self.CHOICES_SHORTCUTS.length > 0 ? self.CHOICES_SHORTCUTS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('trigger', 'shortcut', opt.shortcut)
+			},
+		}
+
+		// TODO(Peter): Retest on later automator
+		/*actions.fire_macro = {
+			name: 'Fire Macro',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Macro',
+					id: 'macro',
+					choices: self.CHOICES_MACROS,
+					default: self.CHOICES_MACROS.length > 0 ? self.CHOICES_MACROS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('macro', '', opt.macro)
+			},
+		}*/
+
+		actions.start_timer = {
+			name: 'Start Timer',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Timer',
+					id: 'timer',
+					choices: self.CHOICES_TIMERS,
+					default: self.CHOICES_TIMERS.length > 0 ? self.CHOICES_TIMERS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('timer', 'start', opt.timer)
+			},
+		}
+
+		actions.stop_timer = {
+			name: 'Stop Timer',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Timer',
+					id: 'timer',
+					choices: self.CHOICES_TIMERS,
+					default: self.CHOICES_TIMERS.length > 0 ? self.CHOICES_TIMERS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('timer', 'stop', opt.timer)
+			},
+		}
+
+		actions.stop_all_timers = {
+			name: 'Stop All Timers',
+			options: [],
+			callback: async function (action) {
+				self.sendCommand('timer', 'stop')
 			},
 		}
 

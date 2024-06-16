@@ -1,16 +1,15 @@
 {
-	"id": "sony-bravia",
-	"name": "sony-bravia",
-	"shortname": "sony-bravia",
+	"id": "tinkerlist-cuez-automator",
+	"name": "tinkerlist-cuez-automator",
+	"shortname": "cuez-automator",
 	"description": "",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-sony-bravia.git",
-	"bugs": "https://github.com/bitfocus/companion-module-sony-bravia/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-tinkerlist-cuez-automator.git",
+	"bugs": "https://github.com/bitfocus/companion-module-tinkerlist-cuez-automator/issues",
 	"maintainers": [
 		{
-			"name": "Joseph Adams",
-			"email": "josephdadams@gmail.com"
+			"name": "Peter Newman"
 		}
 	],
 	"legacyIds": [],
@@ -20,7 +19,7 @@
 		"apiVersion": "0.0.0",
 		"entrypoint": "../index.js"
 	},
-	"manufacturer": "Sony",
-	"products": ["Bravia"],
-	"keywords": ["TV"]
+	"manufacturer": "TinkerList",
+	"products": ["Cuez - Automator"],
+	"keywords": ["Running Order"]
 }

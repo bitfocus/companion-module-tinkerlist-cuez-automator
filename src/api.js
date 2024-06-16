@@ -8,7 +8,7 @@ module.exports = {
 
 		self.updateStatus(InstanceStatus.Connecting)
 
-		self.sendCommand('avContent', 'getCurrentExternalInputsStatus', {}, 'allinputs')
+		self.sendCommand('app', 'webconnection', '', '', {}, 'webconnection')
 
 		self.getInformation()
 		self.setupInterval()
@@ -38,129 +38,155 @@ module.exports = {
 	getInformation: async function () {
 		let self = this
 
-		self.sendCommand('system', 'getPowerStatus', {}, 'power')
-		self.sendCommand('audio', 'getVolumeInformation', {}, 'volume')
-		self.sendCommand('avContent', 'getPlayingContentInfo', {}, 'input')
+		self.sendCommand('trigger', 'button', '', '', {}, 'buttons')
+		self.sendCommand('trigger', 'shortcut', '', '', {}, 'shortcuts')
+		self.sendCommand('macro', '', '', '', {}, 'macros')
+		self.sendCommand('timer', '', '', '', {}, 'timers')
 	},
 
-	sendCommand: function (service, method, params, request = undefined) {
+	sendCommand: function (service, method, value = '', action = '', params = {}, request = undefined) {
 		let self = this
 
 		let cmdObj = {}
-		cmdObj.method = method
-		cmdObj.version = '1.0'
-		cmdObj.id = 1
 		if (JSON.stringify(params) == '{}') {
 			cmdObj.params = []
 		} else {
 			cmdObj.params = [params]
 		}
 
-		if (self.config.psk !== undefined && self.config.psk !== '') {
-			let args = {
-				data: cmdObj,
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Auth-PSK': self.config.psk,
-				},
+		let args = {
+			//data: cmdObj,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}
+
+		let client = new Client()
+
+		let url = `http://${self.config.host}:${self.config.port}/api/${service}/${method}`
+		if (value !== undefined && value !== '') {
+			url += `/${value}`
+			if (action !== undefined && action !== '') {
+				url += `/${action}`
 			}
+		}
 
-			let client = new Client()
-
-			client
-				.post(`http://${self.config.host}/sony/${service}`, args, function (data, response) {
-					//do something with response
-					try {
-						if (response.statusCode == 200) {
-							self.updateStatus(InstanceStatus.Ok)
-							if (request) {
-								if (data.result) {
-									switch (request) {
-										case 'allinputs':
-											self.DATA.inputs = data.result[0]
-											self.buildInputList()
-											self.initFeedbacks()
-											self.initPresets()
-											break
-										case 'power':
-											self.DATA.powerState = data.result[0].status === 'active' ? true : false
-											break
-										case 'volume':
-											self.DATA.volumeLevel = data.result[0][0].volume
-											self.DATA.muteState = data.result[0][0].mute
-											break
-										case 'input':
-											self.DATA.input = data.result[0].uri
-											break
-										default:
-											break
-									}
-								} else {
-									if (data.error) {
-										//some error like display is probably off
-									}
-								}
-							}
-
-							self.checkFeedbacks()
-							self.checkVariables()
-						} else {
-							if (response.statusCode == 403) {
-								self.updateStatus(InstanceStatus.ConnectionFailure, 'Error 403, PSK may be incorrect.')
-								self.log('error', 'PSK may be incorrect. Please check your PSK and try again.')
-								self.stopInterval()
+		client
+			.get(url, args, function (data, response) {
+				//do something with response
+				try {
+					self.log('debug', 'Response: ' + JSON.stringify(response.statusCode) + ' Data: ' + JSON.stringify(data))
+					if (response.statusCode == 200) {
+						self.updateStatus(InstanceStatus.Ok)
+						if (request) {
+							switch (request) {
+								case 'buttons':
+									self.DATA.buttons = data
+									self.buildDeckButtonList()
+									self.buildDeckSwitchList()
+									self.initActions()
+									self.initFeedbacks()
+									self.initPresets()
+									break
+								case 'shortcuts':
+									self.DATA.shortcuts = data
+									self.buildShortcutList()
+									self.initActions()
+									self.initFeedbacks()
+									self.initPresets()
+									break
+								case 'macros':
+									self.DATA.macros = data
+									self.buildMacroList()
+									self.initActions()
+									self.initFeedbacks()
+									self.initPresets()
+									break
+								case 'timers':
+									self.DATA.timers = data
+									self.buildTimerList()
+									self.initActions()
+									self.initFeedbacks()
+									self.initPresets()
+									break
+								default:
+									self.log('warn', 'Unknown request: ' + request)
+									break
 							}
 						}
-					} catch (error) {
-						self.updateStatus(InstanceStatus.UnknownError, 'Failed to process response: ' + error)
-						self.log('error', 'Error processing response: ' + error)
-						console.log(error)
-						console.log(data)
+
+						self.checkFeedbacks()
+						self.checkVariables()
+					} else {
+						self.log('debug', 'Called: ' + url)
+						if (response.statusCode == 400 || response.statusCode == 500) {
+							self.updateStatus(InstanceStatus.ConnectionFailure, 'Error ' + response.statusCode + '.')
+							self.log('error', 'Error ' + response.statusCode)
+							self.stopInterval()
+						} else {
+							self.log('warn', 'Unknown status code: ' + response.statusCode)
+						}
 					}
-				})
-				.on('error', function (error) {
-					self.updateStatus(InstanceStatus.UnknownError, 'Failed to sending command ' + error.toString())
-					self.log('error', 'Error Sending Command ' + error.toString())
-				})
-		} else {
-			self.updateStatus(InstanceStatus.BadConfig, 'No PSK set, not sending.')
-			if (self.config.verbose) {
-				self.log('debug', 'No PSK set. Not sending command.')
-			}
-		}
-	},
-
-	parseDeviceResourceURI: function (uri) {
-		try {
-			resourceURI = new URL(uri)
-			if (resourceURI.protocol == 'extinput:') {
-				let params = resourceURI.searchParams
-				return {
-					// Seemingly not URL.host!
-					kind: resourceURI.pathname,
-					port: parseInt(params.get('port')),
+				} catch (error) {
+					self.updateStatus(InstanceStatus.UnknownError, 'Failed to process response: ' + error)
+					self.log('error', 'Error processing response: ' + error)
+					console.log(error)
+					console.log(data)
 				}
-			} else {
-				return undefined
-			}
-		} catch (e) {
-			// instanceof doesn't seem to work directly
-			if (e.name == 'TypeError') {
-				return undefined
-			} else {
-				throw e
-			}
-		}
+			})
+			.on('error', function (error) {
+				self.updateStatus(InstanceStatus.UnknownError, 'Failed to sending command ' + error.toString())
+				self.log('error', 'Error Sending Command ' + error.toString())
+			})
 	},
 
-	buildInputList: function () {
+	buildDeckButtonList: function () {
 		let self = this
 
-		self.CHOICES_INPUTS = []
+		self.CHOICES_DECK_BUTTONS = []
 
-		for (let i = 0; i < self.DATA.inputs.length; i++) {
-			let input = self.DATA.inputs[i]
-			self.CHOICES_INPUTS.push({ id: input.uri, label: input.title })
+		for (const button of self.DATA.buttons) {
+			if (button.type !== undefined && button.type === 'button') {
+				self.CHOICES_DECK_BUTTONS.push({ id: button.id, label: button.title })
+			}
+		}
+	},
+	buildDeckSwitchList: function () {
+		let self = this
+
+		self.CHOICES_DECK_SWITCHES = []
+
+		for (const button of self.DATA.buttons) {
+			if (button.type !== undefined && button.type === 'switch') {
+				self.CHOICES_DECK_SWITCHES.push({ id: button.id, label: button.title })
+			}
+		}
+	},
+	buildShortcutList: function () {
+		let self = this
+
+		self.CHOICES_SHORTCUTS = []
+
+		for (const shortcut of self.DATA.shortcuts) {
+			self.CHOICES_SHORTCUTS.push({ id: shortcut.id, label: shortcut.key })
+		}
+	},
+	buildMacroList: function () {
+		let self = this
+
+		self.CHOICES_MACROS = []
+
+		for (const macro of self.DATA.macros) {
+			self.CHOICES_MACROS.push({ id: macro.id, label: macro.title })
+		}
+	},
+	buildTimerList: function () {
+		let self = this
+
+		self.CHOICES_TIMERS = []
+
+		for (const timer of self.DATA.timers) {
+			self.CHOICES_TIMERS.push({ id: timer.id, label: timer.title })
 		}
 	},
 }
