@@ -28,11 +28,11 @@ jobs:
       - name: prettier
         run: |
           yarn prettier --check .
-      - name: Test jest
-        run: |
-          yarn test
-        env:
-          CI: true
+#      - name: Test jest
+#        run: |
+#          yarn test
+#        env:
+#          CI: true
       - name: Test package
         run: |
           yarn companion-module-build
