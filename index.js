@@ -32,6 +32,7 @@ class cuezAutomatorInstance extends InstanceBase {
 			shortcuts: [],
 			macros: [],
 			timers: [],
+			items: [],
 		}
 
 		this.CHOICES_DECK_BUTTONS = []
@@ -39,6 +40,7 @@ class cuezAutomatorInstance extends InstanceBase {
 		this.CHOICES_SHORTCUTS = []
 		this.CHOICES_MACROS = []
 		this.CHOICES_TIMERS = []
+		this.CHOICES_ITEMS = []
 	}
 
 	async destroy() {
