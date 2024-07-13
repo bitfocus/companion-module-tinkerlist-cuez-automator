@@ -11,8 +11,7 @@ module.exports = {
 		let self = this
 
 		try {
-			self.setVariableValues({
-			})
+			self.setVariableValues({})
 		} catch (error) {
 			self.log('error', 'Error setting variables: ' + error)
 		}

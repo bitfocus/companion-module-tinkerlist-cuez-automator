@@ -8,7 +8,7 @@ module.exports = {
 
 		self.updateStatus(InstanceStatus.Connecting)
 
-		self.sendCommand('app', 'webconnection', '', '', {}, 'webconnection')
+		self.sendCommand('GET', 'app', 'webconnection', '', '', {}, 'webconnection')
 
 		self.getInformation()
 		self.setupInterval()
@@ -38,13 +38,86 @@ module.exports = {
 	getInformation: async function () {
 		let self = this
 
-		self.sendCommand('trigger', 'button', '', '', {}, 'buttons')
-		self.sendCommand('trigger', 'shortcut', '', '', {}, 'shortcuts')
-		self.sendCommand('macro', '', '', '', {}, 'macros')
-		self.sendCommand('timer', '', '', '', {}, 'timers')
+		self.sendCommand('GET', 'trigger', 'button', '', '', {}, 'buttons')
+		self.sendCommand('GET', 'trigger', 'shortcut', '', '', {}, 'shortcuts')
+		self.sendCommand('GET', 'macro', '', '', '', {}, 'macros')
+		self.sendCommand('GET', 'timer', '', '', '', {}, 'timers')
+		self.sendCommand('GET', 'episode', 'items', '', '', {}, 'items')
 	},
 
-	sendCommand: function (service, method, value = '', action = '', params = {}, request = undefined) {
+	handleResponse: function (data, response, url, request) {
+		let self = this
+
+		//do something with response
+		try {
+			self.log('debug', 'Response: ' + JSON.stringify(response.statusCode) + ' Data: ' + JSON.stringify(data))
+			if (response.statusCode == 200) {
+				self.updateStatus(InstanceStatus.Ok)
+				if (request) {
+					switch (request) {
+						case 'buttons':
+							self.DATA.buttons = data
+							self.buildDeckButtonList()
+							self.buildDeckSwitchList()
+							self.initActions()
+							self.initFeedbacks()
+							self.initPresets()
+							break
+						case 'shortcuts':
+							self.DATA.shortcuts = data
+							self.buildShortcutList()
+							self.initActions()
+							self.initFeedbacks()
+							self.initPresets()
+							break
+						case 'macros':
+							self.DATA.macros = data
+							self.buildMacroList()
+							self.initActions()
+							self.initFeedbacks()
+							self.initPresets()
+							break
+						case 'timers':
+							self.DATA.timers = data
+							self.buildTimerList()
+							self.initActions()
+							self.initFeedbacks()
+							self.initPresets()
+							break
+						case 'items':
+							self.DATA.items = data
+							self.buildItemList()
+							self.initActions()
+							self.initFeedbacks()
+							self.initPresets()
+							break
+						default:
+							self.log('warn', 'Unknown request: ' + request)
+							break
+					}
+				}
+
+				self.checkFeedbacks()
+				self.checkVariables()
+			} else {
+				self.log('debug', 'Called: ' + url)
+				if (response.statusCode == 400 || response.statusCode == 500) {
+					self.updateStatus(InstanceStatus.ConnectionFailure, 'Error ' + response.statusCode + '.')
+					self.log('error', 'Error ' + response.statusCode)
+					self.stopInterval()
+				} else {
+					self.log('warn', 'Unknown status code: ' + response.statusCode)
+				}
+			}
+		} catch (error) {
+			self.updateStatus(InstanceStatus.UnknownError, 'Failed to process response: ' + error)
+			self.log('error', 'Error processing response: ' + error)
+			console.log(error)
+			console.log(data)
+		}
+	},
+
+	sendCommand: function (verb, service, method, value = '', action = '', params = {}, request = undefined) {
 		let self = this
 
 		let cmdObj = {}
@@ -55,7 +128,6 @@ module.exports = {
 		}
 
 		let args = {
-			//data: cmdObj,
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -71,73 +143,46 @@ module.exports = {
 			}
 		}
 
-		client
-			.get(url, args, function (data, response) {
-				//do something with response
-				try {
-					self.log('debug', 'Response: ' + JSON.stringify(response.statusCode) + ' Data: ' + JSON.stringify(data))
-					if (response.statusCode == 200) {
-						self.updateStatus(InstanceStatus.Ok)
-						if (request) {
-							switch (request) {
-								case 'buttons':
-									self.DATA.buttons = data
-									self.buildDeckButtonList()
-									self.buildDeckSwitchList()
-									self.initActions()
-									self.initFeedbacks()
-									self.initPresets()
-									break
-								case 'shortcuts':
-									self.DATA.shortcuts = data
-									self.buildShortcutList()
-									self.initActions()
-									self.initFeedbacks()
-									self.initPresets()
-									break
-								case 'macros':
-									self.DATA.macros = data
-									self.buildMacroList()
-									self.initActions()
-									self.initFeedbacks()
-									self.initPresets()
-									break
-								case 'timers':
-									self.DATA.timers = data
-									self.buildTimerList()
-									self.initActions()
-									self.initFeedbacks()
-									self.initPresets()
-									break
-								default:
-									self.log('warn', 'Unknown request: ' + request)
-									break
-							}
-						}
+		client.on('error', function (error) {
+			self.updateStatus(InstanceStatus.UnknownError, 'Failed to sending command ' + error.toString())
+			self.log('error', 'Error Sending Command ' + error.toString())
+		})
 
-						self.checkFeedbacks()
-						self.checkVariables()
-					} else {
-						self.log('debug', 'Called: ' + url)
-						if (response.statusCode == 400 || response.statusCode == 500) {
-							self.updateStatus(InstanceStatus.ConnectionFailure, 'Error ' + response.statusCode + '.')
-							self.log('error', 'Error ' + response.statusCode)
-							self.stopInterval()
-						} else {
-							self.log('warn', 'Unknown status code: ' + response.statusCode)
-						}
-					}
-				} catch (error) {
-					self.updateStatus(InstanceStatus.UnknownError, 'Failed to process response: ' + error)
-					self.log('error', 'Error processing response: ' + error)
-					console.log(error)
-					console.log(data)
-				}
-			})
-			.on('error', function (error) {
-				self.updateStatus(InstanceStatus.UnknownError, 'Failed to sending command ' + error.toString())
-				self.log('error', 'Error Sending Command ' + error.toString())
-			})
+		switch (verb) {
+			case 'GET':
+				client.get(url, args, function (data, response) {
+					self.handleResponse(data, response, url, request)
+				})
+
+				break
+			case 'POST':
+				client.post(url, args, function (data, response) {
+					self.handleResponse(data, response, url, request)
+				})
+
+				break
+			case 'PUT':
+				client.put(url, args, function (data, response) {
+					self.handleResponse(data, response, url, request)
+				})
+
+				break
+			case 'DELETE':
+				client.delete(url, args, function (data, response) {
+					self.handleResponse(data, response, url, request)
+				})
+
+				break
+			case 'PATCH':
+				client.patch(url, args, function (data, response) {
+					self.handleResponse(data, response, url, request)
+				})
+
+				break
+			default:
+				self.updateStatus(InstanceStatus.UnknownError, 'Unknown verb ' + verb + ' when sending command')
+				self.log('error', 'Unknown verb ' + verb + ' when sending command')
+		}
 	},
 
 	buildDeckButtonList: function () {
@@ -187,6 +232,18 @@ module.exports = {
 
 		for (const timer of self.DATA.timers) {
 			self.CHOICES_TIMERS.push({ id: timer.id, label: timer.title })
+		}
+	},
+	buildItemList: function () {
+		let self = this
+
+		self.CHOICES_ITEMS = []
+
+		for (const item of self.DATA.items) {
+			// TODO(Peter): Currently Items within Parts that are floated don't show as floated
+			if (item.float !== undefined && item.float === false) {
+				self.CHOICES_ITEMS.push({ id: item.id, label: item.label + ' - ' + item.title })
+			}
 		}
 	},
 }

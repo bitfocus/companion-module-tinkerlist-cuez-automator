@@ -7,7 +7,7 @@ module.exports = {
 			name: 'Next',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('trigger', 'next')
+				self.sendCommand('GET', 'trigger', 'next')
 			},
 		}
 
@@ -15,7 +15,7 @@ module.exports = {
 			name: 'Previous',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('trigger', 'previous')
+				self.sendCommand('GET', 'trigger', 'previous')
 			},
 		}
 
@@ -23,7 +23,7 @@ module.exports = {
 			name: 'Next Trigger',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('trigger', 'nextTrigger')
+				self.sendCommand('GET', 'trigger', 'nextTrigger')
 			},
 		}
 
@@ -31,7 +31,7 @@ module.exports = {
 			name: 'Previous Trigger',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('trigger', 'previousTrigger')
+				self.sendCommand('GET', 'trigger', 'previousTrigger')
 			},
 		}
 
@@ -48,7 +48,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('trigger', 'button', opt.button)
+				self.sendCommand('GET', 'trigger', 'button', opt.button)
 			},
 		}
 
@@ -65,7 +65,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('trigger', 'button', opt.switch, 'on')
+				self.sendCommand('GET', 'trigger', 'button', opt.switch, 'on')
 			},
 		}
 
@@ -82,7 +82,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('trigger', 'button', opt.switch, 'off')
+				self.sendCommand('GET', 'trigger', 'button', opt.switch, 'off')
 			},
 		}
 
@@ -99,7 +99,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('trigger', 'button', opt.switch, 'click')
+				self.sendCommand('GET', 'trigger', 'button', opt.switch, 'click')
 			},
 		}
 
@@ -116,7 +116,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('trigger', 'shortcut', opt.shortcut)
+				self.sendCommand('GET', 'trigger', 'shortcut', opt.shortcut)
 			},
 		}
 
@@ -134,7 +134,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('macro', '', opt.macro)
+				self.sendCommand('GET', 'macro', '', opt.macro)
 			},
 		}*/
 
@@ -151,7 +151,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('timer', 'start', opt.timer)
+				self.sendCommand('GET', 'timer', 'start', opt.timer)
 			},
 		}
 
@@ -168,7 +168,7 @@ module.exports = {
 			],
 			callback: async function (action) {
 				let opt = action.options
-				self.sendCommand('timer', 'stop', opt.timer)
+				self.sendCommand('GET', 'timer', 'stop', opt.timer)
 			},
 		}
 
@@ -176,7 +176,50 @@ module.exports = {
 			name: 'Stop All Timers',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('timer', 'stop')
+				self.sendCommand('GET', 'timer', 'stop')
+			},
+		}
+
+		actions.unload_episode = {
+			name: 'Unload Episode',
+			options: [],
+			callback: async function (action) {
+				self.sendCommand('DELETE', 'episode')
+			},
+		}
+
+		actions.select_episode = {
+			name: 'Select Episode',
+			options: [
+				{
+					type: 'textinput',
+					label: 'Episode GUID',
+					id: 'episode',
+					default: '1abc2345-678d-9e01-2fa3-456789012b34',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('PATCH', 'episode', opt.episode, 'select')
+				// Refresh the block list
+				self.sendCommand('GET', 'episode', 'items', '', '', {}, 'items')
+			},
+		}
+
+		actions.trigger_block = {
+			name: 'Trigger Item',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Item',
+					id: 'block',
+					choices: self.CHOICES_ITEMS,
+					default: self.CHOICES_ITEMS.length > 0 ? self.CHOICES_ITEMS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('GET', 'trigger', 'block', opt.block)
 			},
 		}
 
