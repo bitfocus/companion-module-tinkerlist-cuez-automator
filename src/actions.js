@@ -31,7 +31,7 @@ module.exports = {
 			name: 'Previous Trigger',
 			options: [],
 			callback: async function (action) {
-				self.sendCommand('trigger', 'previous')
+				self.sendCommand('trigger', 'previousTrigger')
 			},
 		}
 
