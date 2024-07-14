@@ -1,48 +1,163 @@
 const { InstanceStatus } = require('@companion-module/base')
+const { WebSocket } = require('ws')
 
 const Client = require('node-rest-client').Client
 
 module.exports = {
 	initConnection: function () {
 		let self = this
-
-		self.updateStatus(InstanceStatus.Connecting)
-
-		self.sendCommand('GET', 'app', 'webconnection', '', '', {}, 'webconnection')
-
-		self.getInformation()
-		self.setupInterval()
 	},
 
-	setupInterval: function () {
-		let self = this
+	initWebSocket: function () {
+		this.log('debug', 'Starting ws')
 
-		self.stopInterval()
-
-		if (self.config.polling !== undefined && self.config.polling && self.config.interval > 0) {
-			self.INTERVAL = setInterval(self.getInformation.bind(self), self.config.interval)
-			self.log('info', 'Starting Update Interval: Every ' + self.config.interval + 'ms')
+		if (this.reconnect_timer) {
+			clearTimeout(this.reconnect_timer)
+			this.reconnect_timer = null
 		}
-	},
 
-	stopInterval: function () {
-		let self = this
-
-		if (self.INTERVAL !== null) {
-			self.log('info', 'Stopping Update Interval.')
-			clearInterval(self.INTERVAL)
-			self.INTERVAL = null
+		this.log('debug', 'Checking config...')
+		const url = 'ws://' + this.config.host + ':' + this.config.port + '/ws'
+		if (!url || !this.config.host) {
+			this.updateStatus(InstanceStatus.BadConfig, `IP address is missing`)
+			return
+		} else if (!url || !this.config.port) {
+			this.updateStatus(InstanceStatus.BadConfig, `Port is missing`)
+			return
 		}
+
+		this.updateStatus(InstanceStatus.Connecting)
+		this.log('debug', 'Connecting...')
+
+		if (this.ws) {
+			this.ws.close(1000)
+			delete this.ws
+		}
+		this.ws = new WebSocket(url)
+
+		this.ws.on('open', () => {
+			this.updateStatus(InstanceStatus.Ok)
+		})
+		this.ws.on('close', (code) => {
+			this.updateStatus(InstanceStatus.Disconnected, `Connection closed with code ${code}`)
+			this.maybeReconnect()
+		})
+
+		this.ws.on('message', this.messageReceivedFromWebSocket.bind(this))
+
+		this.ws.on('error', (data) => {
+			this.log('error', `WebSocket error: ${data}`)
+		})
 	},
 
-	getInformation: async function () {
-		let self = this
+	handleWSWelcome: function (msg) {
+		this.log('debug', 'clientid: ' + msg.data.clientid)
 
-		self.sendCommand('GET', 'trigger', 'button', '', '', {}, 'buttons')
-		self.sendCommand('GET', 'trigger', 'shortcut', '', '', {}, 'shortcuts')
-		self.sendCommand('GET', 'macro', '', '', '', {}, 'macros')
-		self.sendCommand('GET', 'timer', '', '', '', {}, 'timers')
-		self.sendCommand('GET', 'episode', 'items', '', '', {}, 'items')
+		// Call HTTP
+		this.sendCommand('POST', 'app', 'init', '', '', { hello: 'from client', clientid: msg.data.clientid })
+
+		//'http://10.0.0.9:7070/api/app/init' 'Content-Type: application/json'  '{"hello":"from client","clientid":"32bcef15-3ddb-4e9b-a00d-7d404aa76b0b"}'
+	},
+
+	handleWSProjectSelected: function (msg) {
+		this.log('debug', 'Selected Project: ' + msg.data.title)
+	},
+
+	handleWSProjectRundownsOnair: function (msg) {
+		this.log('debug', 'Rundown list: ' + msg.data.length)
+		this.DATA.rundowns = msg.data
+		this.buildRundownList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	handleWSEpisode: function (msg) {
+		this.log('debug', 'Rundown list: ' + msg.data.length)
+		this.DATA.episode = msg.data
+		this.buildItemList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	handleWSConfigCuezDeckButtons: function (msg) {
+		this.log('debug', 'Button list: ' + msg.data.value.length)
+		this.DATA.buttons = msg.data.value
+		this.buildDeckButtonList()
+		this.buildDeckSwitchList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	handleWSConfigKeys: function (msg) {
+		this.log('debug', 'Key list: ' + msg.data.value.keys.length)
+		this.DATA.keys = msg.data.value.keys
+		this.buildShortcutList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	handleWSConfigMacros: function (msg) {
+		this.log('debug', 'Macro list: ' + msg.data.value.macros.length)
+		this.DATA.macros = msg.data.value.macros
+		this.buildMacroList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	handleWSConfigTimers: function (msg) {
+		this.log('debug', 'Timer list: ' + msg.data.value.timers.length)
+		this.DATA.timers = msg.data.value.timers
+		this.buildTimerList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
+	messageReceivedFromWebSocket: function (data) {
+		let msgValue = null
+		try {
+			msgValue = JSON.parse(data)
+		} catch (e) {
+			msgValue = data
+		}
+		if (msgValue.method != null) {
+			this.log('debug', `WebSocket message method: ` + msgValue.method)
+			switch (msgValue.method) {
+				case 'welcome':
+					this.log('debug', `Welcome`)
+					this.handleWSWelcome(msgValue)
+					break
+				case 'project-selected':
+					this.handleWSProjectSelected(msgValue)
+					break
+				case 'project-rundowns-onair':
+					this.handleWSProjectRundownsOnair(msgValue)
+					break
+				case 'episode':
+					this.handleWSEpisode(msgValue)
+					break
+				case 'config--cuezDeckButtons--':
+					this.handleWSConfigCuezDeckButtons(msgValue)
+					break
+				case 'config--keys--':
+					this.handleWSConfigKeys(msgValue)
+					break
+				case 'config--macros--':
+					this.handleWSConfigMacros(msgValue)
+					break
+				case 'config--timers--':
+					this.handleWSConfigTimers(msgValue)
+					break
+				default:
+					this.log('info', `Unknown WebSocket message method: ` + msgValue.method)
+					this.log('debug', `WebSocket data: ` + data)
+			}
+		}
 	},
 
 	handleResponse: function (data, response, url, request) {
@@ -56,6 +171,7 @@ module.exports = {
 				if (request) {
 					switch (request) {
 						case 'buttons':
+							// TODO(Peter): Reject if not an array
 							self.DATA.buttons = data
 							self.buildDeckButtonList()
 							self.buildDeckSwitchList()
@@ -104,7 +220,6 @@ module.exports = {
 				if (response.statusCode == 400 || response.statusCode == 500) {
 					self.updateStatus(InstanceStatus.ConnectionFailure, 'Error ' + response.statusCode + '.')
 					self.log('error', 'Error ' + response.statusCode)
-					self.stopInterval()
 				} else {
 					self.log('warn', 'Unknown status code: ' + response.statusCode)
 				}
@@ -185,6 +300,36 @@ module.exports = {
 		}
 	},
 
+	buildRundownList: function () {
+		let self = this
+
+		self.CHOICES_RUNDOWNS = []
+
+		for (const rundown of self.DATA.rundowns) {
+			self.CHOICES_RUNDOWNS.push({ id: rundown.id, label: rundown.title })
+		}
+	},
+	buildItemList: function () {
+		let self = this
+
+		self.CHOICES_ITEMS = []
+
+		for (const partId of self.DATA.episode.episode.parts) {
+			const part = self.DATA.episode.parts[partId]
+			if (part.float !== undefined && part.float === false) {
+				for (const itemId of part.items) {
+					const item = self.DATA.episode.items[itemId]
+					if (item.float !== undefined && item.float === false) {
+						self.CHOICES_ITEMS.push({ id: item.id, label: part.title + ' - ' + item.title.title })
+					} else {
+						self.log('debug', 'Skipping item ' + item.title.title + ' of part ' + part.title + ' as its floated')
+					}
+				}
+			} else {
+				self.log('debug', 'Skipping part ' + part.title + ' as its floated')
+			}
+		}
+	},
 	buildDeckButtonList: function () {
 		let self = this
 
@@ -212,8 +357,9 @@ module.exports = {
 
 		self.CHOICES_SHORTCUTS = []
 
-		for (const shortcut of self.DATA.shortcuts) {
-			self.CHOICES_SHORTCUTS.push({ id: shortcut.id, label: shortcut.key })
+		for (const key of self.DATA.keys) {
+			// TODO(Peter): Add modifiers to label
+			self.CHOICES_SHORTCUTS.push({ id: key.id, label: key.key })
 		}
 	},
 	buildMacroList: function () {
@@ -232,18 +378,6 @@ module.exports = {
 
 		for (const timer of self.DATA.timers) {
 			self.CHOICES_TIMERS.push({ id: timer.id, label: timer.title })
-		}
-	},
-	buildItemList: function () {
-		let self = this
-
-		self.CHOICES_ITEMS = []
-
-		for (const item of self.DATA.items) {
-			// TODO(Peter): Currently Items within Parts that are floated don't show as floated
-			if (item.float !== undefined && item.float === false) {
-				self.CHOICES_ITEMS.push({ id: item.id, label: item.label + ' - ' + item.title })
-			}
 		}
 	},
 }
