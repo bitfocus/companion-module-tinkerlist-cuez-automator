@@ -192,17 +192,16 @@ module.exports = {
 			name: 'Select Episode',
 			options: [
 				{
-					type: 'textinput',
-					label: 'Episode GUID',
+					type: 'dropdown',
+					label: 'Episode',
 					id: 'episode',
-					default: '1abc2345-678d-9e01-2fa3-456789012b34',
+					choices: self.CHOICES_RUNDOWNS,
+					default: self.CHOICES_RUNDOWNS.length > 0 ? self.CHOICES_RUNDOWNS[0].id : '',
 				},
 			],
 			callback: async function (action) {
 				let opt = action.options
 				self.sendCommand('PATCH', 'episode', opt.episode, 'select')
-				// Refresh the block list
-				self.sendCommand('GET', 'episode', 'items', '', '', {}, 'items')
 			},
 		}
 
@@ -220,6 +219,14 @@ module.exports = {
 			callback: async function (action) {
 				let opt = action.options
 				self.sendCommand('GET', 'trigger', 'block', opt.block)
+			},
+		}
+
+		actions.trigger_first_block = {
+			name: 'Trigger First Item',
+			options: [],
+			callback: async function (action) {
+				self.sendCommand('GET', 'trigger', 'block', self.CHOICES_ITEMS.length > 0 ? self.CHOICES_ITEMS[0].id : '')
 			},
 		}
 
