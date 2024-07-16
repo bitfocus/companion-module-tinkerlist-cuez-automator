@@ -73,7 +73,11 @@ module.exports = {
 	},
 
 	handleWSEpisode: function (msg) {
-		this.log('debug', 'Rundown list: ' + msg.data.length)
+		if (msg.data != null) {
+			this.log('debug', 'Episode item list: ' + msg.data.length)
+		} else {
+			this.log('debug', 'Episode item list - None')
+		}
 		this.DATA.episode = msg.data
 		this.buildItemList()
 		this.initActions()
@@ -314,20 +318,24 @@ module.exports = {
 
 		self.CHOICES_ITEMS = []
 
-		for (const partId of self.DATA.episode.episode.parts) {
-			const part = self.DATA.episode.parts[partId]
-			if (part.float !== undefined && part.float === false) {
-				for (const itemId of part.items) {
-					const item = self.DATA.episode.items[itemId]
-					if (item.float !== undefined && item.float === false) {
-						self.CHOICES_ITEMS.push({ id: item.id, label: part.title + ' - ' + item.title.title })
-					} else {
-						self.log('debug', 'Skipping item ' + item.title.title + ' of part ' + part.title + ' as its floated')
+		if (self.DATA.episode != null) {
+			for (const partId of self.DATA.episode.episode.parts) {
+				const part = self.DATA.episode.parts[partId]
+				if (part.float !== undefined && part.float === false) {
+					for (const itemId of part.items) {
+						const item = self.DATA.episode.items[itemId]
+						if (item.float !== undefined && item.float === false) {
+							self.CHOICES_ITEMS.push({ id: item.id, label: part.title + ' - ' + item.title.title })
+						} else {
+							self.log('debug', 'Skipping item ' + item.title.title + ' of part ' + part.title + ' as its floated')
+						}
 					}
+				} else {
+					self.log('debug', 'Skipping part ' + part.title + ' as its floated')
 				}
-			} else {
-				self.log('debug', 'Skipping part ' + part.title + ' as its floated')
 			}
+		} else {
+			self.log('debug', 'Episode has no items')
 		}
 	},
 	buildDeckButtonList: function () {
