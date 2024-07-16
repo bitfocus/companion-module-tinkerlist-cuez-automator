@@ -69,8 +69,17 @@ module.exports = {
 		switch (msg.data.state) {
 			case 'SELECT_RUNDOWN':
 				this.DATA.episode = null
-				// TODO(Peter): What else needs clearing down here, buttons etc?
+				this.DATA.items = null
+				this.DATA.buttons = null
+				this.DATA.keys = null
+				this.DATA.macros = null
+				this.DATA.timers = null
 				this.buildItemList()
+				this.buildDeckButtonList()
+				this.buildDeckSwitchList()
+				this.buildShortcutList()
+				this.buildMacroList()
+				this.buildTimerList()
 				this.updateEpisodeVariables()
 				break
 			case 'OK':
@@ -459,10 +468,14 @@ module.exports = {
 
 		self.CHOICES_DECK_BUTTONS = []
 
-		for (const button of self.DATA.buttons) {
-			if (button.type !== undefined && button.type === 'button') {
-				self.CHOICES_DECK_BUTTONS.push({ id: button.id, label: button.title })
+		if (self.DATA.buttons != null) {
+			for (const button of self.DATA.buttons) {
+				if (button.type !== undefined && button.type === 'button') {
+					self.CHOICES_DECK_BUTTONS.push({ id: button.id, label: button.title })
+				}
 			}
+		} else {
+			self.log('debug', 'Buttons have no items')
 		}
 	},
 	buildDeckSwitchList: function () {
@@ -470,10 +483,14 @@ module.exports = {
 
 		self.CHOICES_DECK_SWITCHES = []
 
-		for (const button of self.DATA.buttons) {
-			if (button.type !== undefined && button.type === 'switch') {
-				self.CHOICES_DECK_SWITCHES.push({ id: button.id, label: button.title })
+		if (self.DATA.buttons != null) {
+			for (const button of self.DATA.buttons) {
+				if (button.type !== undefined && button.type === 'switch') {
+					self.CHOICES_DECK_SWITCHES.push({ id: button.id, label: button.title })
+				}
 			}
+		} else {
+			self.log('debug', 'Buttons have no items')
 		}
 	},
 	buildShortcutList: function () {
@@ -481,9 +498,13 @@ module.exports = {
 
 		self.CHOICES_SHORTCUTS = []
 
-		for (const key of self.DATA.keys) {
-			// TODO(Peter): Add modifiers to label
-			self.CHOICES_SHORTCUTS.push({ id: key.id, label: key.key })
+		if (self.DATA.keys != null) {
+			for (const key of self.DATA.keys) {
+				// TODO(Peter): Add modifiers to label
+				self.CHOICES_SHORTCUTS.push({ id: key.id, label: key.key })
+			}
+		} else {
+			self.log('debug', 'Keys have no items')
 		}
 	},
 	buildMacroList: function () {
@@ -491,8 +512,12 @@ module.exports = {
 
 		self.CHOICES_MACROS = []
 
-		for (const macro of self.DATA.macros) {
-			self.CHOICES_MACROS.push({ id: macro.id, label: macro.title })
+		if (self.DATA.macros != null) {
+			for (const macro of self.DATA.macros) {
+				self.CHOICES_MACROS.push({ id: macro.id, label: macro.title })
+			}
+		} else {
+			self.log('debug', 'Macros have no items')
 		}
 	},
 	buildTimerList: function () {
@@ -500,8 +525,12 @@ module.exports = {
 
 		self.CHOICES_TIMERS = []
 
-		for (const timer of self.DATA.timers) {
-			self.CHOICES_TIMERS.push({ id: timer.id, label: timer.title })
+		if (self.DATA.timers != null) {
+			for (const timer of self.DATA.timers) {
+				self.CHOICES_TIMERS.push({ id: timer.id, label: timer.title })
+			}
+		} else {
+			self.log('debug', 'Timers have no items')
 		}
 	},
 }
