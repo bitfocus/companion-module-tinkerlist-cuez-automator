@@ -26,6 +26,9 @@ class cuezAutomatorInstance extends InstanceBase {
 		})
 
 		this.DATA = {
+			appInfo: [],
+			appState: [],
+			project: [],
 			rundowns: [],
 			episode: [],
 			items: [],
@@ -68,7 +71,6 @@ class cuezAutomatorInstance extends InstanceBase {
 		this.initPresets()
 
 		this.checkFeedbacks()
-		this.checkVariables()
 	}
 
 	maybeReconnect() {
