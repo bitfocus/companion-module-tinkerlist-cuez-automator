@@ -86,6 +86,15 @@ module.exports = {
 		this.initPresets()
 	},
 
+	handleWSProjects: function (msg) {
+		this.log('debug', 'Projects list: ' + msg.data.length)
+		this.DATA.projects = msg.data
+		this.buildProjectList()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
 	handleWSProjectSelected: function (msg) {
 		this.log('debug', 'Selected Project: ' + msg.data.title)
 		this.DATA.project = msg.data
@@ -172,6 +181,9 @@ module.exports = {
 					break
 				case 'app-state-changed':
 					this.handleWSAppStateChanged(msgValue)
+					break
+				case 'projects':
+					this.handleWSProjects(msgValue)
 					break
 				case 'project-selected':
 					this.handleWSProjectSelected(msgValue)
@@ -360,6 +372,15 @@ module.exports = {
 			})
 		} catch (error) {
 			this.log('error', 'Error setting variables: ' + error)
+		}
+	},
+	buildProjectList: function () {
+		let self = this
+
+		self.CHOICES_PROJECTS = []
+
+		for (const project of self.DATA.projects) {
+			self.CHOICES_PROJECTS.push({ id: project.id, label: project.title })
 		}
 	},
 	updateProjectVariables: function () {

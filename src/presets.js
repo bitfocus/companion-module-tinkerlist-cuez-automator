@@ -108,6 +108,32 @@ module.exports = {
 			],
 		}
 
+		for (const project of this.CHOICES_PROJECTS) {
+			presets[`select_project_${project.label}`] = {
+				category: 'Projects',
+				name: `Select Project ${project.label}`,
+				type: 'button',
+				style: {
+					text: `Select Project: ${project.label}`,
+					//size: '14',
+					color: foregroundColor,
+					bgcolor: foregroundColorBlack,
+				},
+				feedbacks: [],
+				steps: [
+					{
+						down: [
+							{
+								actionId: 'select_project',
+								options: { project: project.id },
+							},
+						],
+						up: [],
+					},
+				],
+			}
+		}
+
 		// TODO(Peter): Retest on later automator
 		/*for (const macro of this.CHOICES_MACROS) {
 			presets[`fire_macro_${macro.label}`] = {

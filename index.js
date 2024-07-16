@@ -38,6 +38,7 @@ class cuezAutomatorInstance extends InstanceBase {
 			timers: [],
 		}
 
+		this.CHOICES_PROJECTS = []
 		this.CHOICES_RUNDOWNS = []
 		this.CHOICES_ITEMS = []
 		this.CHOICES_DECK_BUTTONS = []
