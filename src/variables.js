@@ -1,19 +1,47 @@
 module.exports = {
 	initVariables: function () {
-		let self = this
-
 		let variables = []
 
-		self.setVariableDefinitions(variables)
-	},
+		variables.push({
+			name: 'Automator ID',
+			variableId: 'automator_id',
+		})
 
-	checkVariables: function () {
-		let self = this
+		variables.push({
+			name: 'Automator Name',
+			variableId: 'automator_name',
+		})
 
-		try {
-			self.setVariableValues({})
-		} catch (error) {
-			self.log('error', 'Error setting variables: ' + error)
-		}
+		variables.push({
+			name: 'Automator Version',
+			variableId: 'automator_version',
+		})
+
+		variables.push({
+			name: 'Automator State',
+			variableId: 'automator_state',
+		})
+
+		variables.push({
+			name: 'Project ID',
+			variableId: 'project_id',
+		})
+
+		variables.push({
+			name: 'Project Title',
+			variableId: 'project_title',
+		})
+
+		variables.push({
+			name: 'Episode ID',
+			variableId: 'episode_id',
+		})
+
+		variables.push({
+			name: 'Episode Title',
+			variableId: 'episode_title',
+		})
+
+		this.setVariableDefinitions(variables)
 	},
 }

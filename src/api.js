@@ -59,8 +59,38 @@ module.exports = {
 		//'http://10.0.0.9:7070/api/app/init' 'Content-Type: application/json'  '{"hello":"from client","clientid":"32bcef15-3ddb-4e9b-a00d-7d404aa76b0b"}'
 	},
 
+	handleWSAppInfo: function (msg) {
+		this.DATA.appInfo = msg.data
+		this.updateAppInfoVariables()
+		this.initFeedbacks()
+	},
+
+	handleWSAppStateChanged: function (msg) {
+		switch (msg.data.state) {
+			case 'SELECT_RUNDOWN':
+				this.DATA.episode = null
+				// TODO(Peter): What else needs clearing down here, buttons etc?
+				this.buildItemList()
+				this.updateEpisodeVariables()
+				break
+			case 'OK':
+				break
+			default:
+				this.log('info', `Unknown App State: ` + msg.data.state)
+				this.log('debug', `WebSocket data: ` + JSON.stringify(msg.data))
+		}
+		this.DATA.appState = msg.data
+		this.updateAppStateVariables()
+		this.initActions()
+		this.initFeedbacks()
+		this.initPresets()
+	},
+
 	handleWSProjectSelected: function (msg) {
 		this.log('debug', 'Selected Project: ' + msg.data.title)
+		this.DATA.project = msg.data
+		this.updateProjectVariables()
+		this.initFeedbacks()
 	},
 
 	handleWSProjectRundownsOnair: function (msg) {
@@ -80,6 +110,7 @@ module.exports = {
 		}
 		this.DATA.episode = msg.data
 		this.buildItemList()
+		this.updateEpisodeVariables()
 		this.initActions()
 		this.initFeedbacks()
 		this.initPresets()
@@ -135,6 +166,12 @@ module.exports = {
 				case 'welcome':
 					this.log('debug', `Welcome`)
 					this.handleWSWelcome(msgValue)
+					break
+				case 'app-info':
+					this.handleWSAppInfo(msgValue)
+					break
+				case 'app-state-changed':
+					this.handleWSAppStateChanged(msgValue)
 					break
 				case 'project-selected':
 					this.handleWSProjectSelected(msgValue)
@@ -218,7 +255,6 @@ module.exports = {
 				}
 
 				self.checkFeedbacks()
-				self.checkVariables()
 			} else {
 				self.log('debug', 'Called: ' + url)
 				if (response.statusCode == 400 || response.statusCode == 500) {
@@ -304,6 +340,38 @@ module.exports = {
 		}
 	},
 
+	updateAppInfoVariables: function () {
+		try {
+			this.setVariableValues({
+				automator_id: this.DATA.appInfo.automator_id,
+				automator_name: this.DATA.appInfo.automator_name,
+				automator_version: this.DATA.appInfo.automator_version,
+			})
+		} catch (error) {
+			this.log('error', 'Error setting variables: ' + error)
+		}
+	},
+	updateAppStateVariables: function () {
+		try {
+			this.setVariableValues({
+				automator_id: this.DATA.appState.id,
+				automator_name: this.DATA.appState.name,
+				automator_state: this.DATA.appState.state,
+			})
+		} catch (error) {
+			this.log('error', 'Error setting variables: ' + error)
+		}
+	},
+	updateProjectVariables: function () {
+		try {
+			this.setVariableValues({
+				project_id: this.DATA.project.id,
+				project_title: this.DATA.project.title,
+			})
+		} catch (error) {
+			this.log('error', 'Error setting variables: ' + error)
+		}
+	},
 	buildRundownList: function () {
 		let self = this
 
@@ -311,6 +379,23 @@ module.exports = {
 
 		for (const rundown of self.DATA.rundowns) {
 			self.CHOICES_RUNDOWNS.push({ id: rundown.id, label: rundown.title })
+		}
+	},
+	updateEpisodeVariables: function () {
+		try {
+			if (this.DATA.episode != null) {
+				this.setVariableValues({
+					episode_id: this.DATA.episode.episode.id,
+					episode_title: this.DATA.episode.episode.title,
+				})
+			} else {
+				this.setVariableValues({
+					episode_id: undefined,
+					episode_title: undefined,
+				})
+			}
+		} catch (error) {
+			this.log('error', 'Error setting variables: ' + error)
 		}
 	},
 	buildItemList: function () {
