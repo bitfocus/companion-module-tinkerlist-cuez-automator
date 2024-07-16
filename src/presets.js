@@ -108,6 +108,30 @@ module.exports = {
 			],
 		}
 
+		presets['trigger_first_block'] = {
+			category: 'Navigation',
+			name: `Trigger First Item`,
+			type: 'button',
+			style: {
+				text: 'Trigger First Item',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'next_first_block',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
 		for (const project of this.CHOICES_PROJECTS) {
 			presets[`select_project_${project.label}`] = {
 				category: 'Projects',
@@ -115,7 +139,6 @@ module.exports = {
 				type: 'button',
 				style: {
 					text: `Select Project: ${project.label}`,
-					//size: '14',
 					color: foregroundColor,
 					bgcolor: foregroundColorBlack,
 				},
