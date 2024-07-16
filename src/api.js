@@ -136,8 +136,13 @@ module.exports = {
 	},
 
 	handleWSConfigKeys: function (msg) {
-		this.log('debug', 'Key list: ' + msg.data.value.keys.length)
-		this.DATA.keys = msg.data.value.keys
+		if (msg.data.value.keys != null) {
+			this.log('debug', 'Key list: ' + msg.data.value.keys.length)
+			this.DATA.keys = msg.data.value.keys
+		} else {
+			this.log('debug', `Didn't get any keys`)
+			this.DATA.keys = []
+		}
 		this.buildShortcutList()
 		this.initActions()
 		this.initFeedbacks()
@@ -145,8 +150,13 @@ module.exports = {
 	},
 
 	handleWSConfigMacros: function (msg) {
-		this.log('debug', 'Macro list: ' + msg.data.value.macros.length)
-		this.DATA.macros = msg.data.value.macros
+		if (msg.data.value.macros != null) {
+			this.log('debug', 'Macro list: ' + msg.data.value.macros.length)
+			this.DATA.macros = msg.data.value.macros
+		} else {
+			this.log('debug', `Didn't get any macros`)
+			this.DATA.macros = []
+		}
 		this.buildMacroList()
 		this.initActions()
 		this.initFeedbacks()
