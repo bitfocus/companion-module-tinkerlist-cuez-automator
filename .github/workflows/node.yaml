@@ -38,3 +38,8 @@ jobs:
           yarn companion-module-build
         env:
           CI: true
+      - name: Save artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module
+          path: ${{github.workspace}}/pkg.tgz
