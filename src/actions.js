@@ -180,6 +180,23 @@ module.exports = {
 			},
 		}
 
+		actions.select_project = {
+			name: 'Select Project',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Project',
+					id: 'project',
+					choices: self.CHOICES_PROJECTS,
+					default: self.CHOICES_PROJECTS.length > 0 ? self.CHOICES_PROJECTS[0].id : '',
+				},
+			],
+			callback: async function (action) {
+				let opt = action.options
+				self.sendCommand('PATCH', 'project', opt.project, 'select')
+			},
+		}
+
 		actions.unload_episode = {
 			name: 'Unload Episode',
 			options: [],
