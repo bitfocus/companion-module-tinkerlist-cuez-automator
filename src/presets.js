@@ -197,7 +197,7 @@ module.exports = {
 						down: [
 							{
 								actionId: 'select_episode',
-								options: { rundown: rundown.id },
+								options: { episode: rundown.id },
 							},
 						],
 						up: [],
