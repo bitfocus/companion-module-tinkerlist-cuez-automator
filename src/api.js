@@ -407,6 +407,7 @@ module.exports = {
 			this.setVariableValues({
 				project_id: this.DATA.project.id,
 				project_title: this.DATA.project.title,
+				project_pairing_expired: this.DATA.project.expired,
 			})
 		} catch (error) {
 			this.log('error', 'Error setting variables: ' + error)

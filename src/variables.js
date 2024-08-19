@@ -33,6 +33,11 @@ module.exports = {
 		})
 
 		variables.push({
+			name: 'Project Pairing Expired',
+			variableId: 'project_pairing_expired',
+		})
+
+		variables.push({
 			name: 'Episode ID',
 			variableId: 'episode_id',
 		})
