@@ -173,8 +173,13 @@ module.exports = {
 	},
 
 	handleWSConfigTimers: function (msg) {
-		this.log('debug', 'Timer list: ' + msg.data.value.timers.length)
-		this.DATA.timers = msg.data.value.timers
+		if (msg.data.value.timers != null) {
+			this.log('debug', 'Timer list: ' + msg.data.value.timers.length)
+			this.DATA.timers = msg.data.value.timers
+		} else {
+			this.log('debug', `Didn't get any timers`)
+			this.DATA.timers = []
+		}
 		this.buildTimerList()
 		this.initActions()
 		this.initFeedbacks()
