@@ -55,8 +55,6 @@ module.exports = {
 
 		// Call HTTP
 		this.sendCommand('POST', 'app', 'init', '', '', { hello: 'from client', clientid: msg.data.clientid })
-
-		//'http://10.0.0.9:7070/api/app/init' 'Content-Type: application/json'  '{"hello":"from client","clientid":"32bcef15-3ddb-4e9b-a00d-7d404aa76b0b"}'
 	},
 
 	handleWSAppInfo: function (msg) {
