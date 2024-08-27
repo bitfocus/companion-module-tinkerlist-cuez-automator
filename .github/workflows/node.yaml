@@ -28,13 +28,18 @@ jobs:
       - name: prettier
         run: |
           yarn prettier --check .
-#      - name: Test jest
-#        run: |
-#          yarn test
-#        env:
-#          CI: true
+      #      - name: Test jest
+      #        run: |
+      #          yarn test
+      #        env:
+      #          CI: true
       - name: Test package
         run: |
           yarn companion-module-build
         env:
           CI: true
+      - name: Save artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module
+          path: ${{github.workspace}}/pkg.tgz

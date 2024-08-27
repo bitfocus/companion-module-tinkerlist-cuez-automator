@@ -25,15 +25,22 @@ class cuezAutomatorInstance extends InstanceBase {
 			...api,
 		})
 
-		this.INTERVAL = null //used to poll for updates
-
 		this.DATA = {
+			appInfo: [],
+			appState: [],
+			project: [],
+			rundowns: [],
+			episode: [],
+			items: [],
 			buttons: [],
-			shortcuts: [],
+			keys: [],
 			macros: [],
 			timers: [],
 		}
 
+		this.CHOICES_PROJECTS = []
+		this.CHOICES_RUNDOWNS = []
+		this.CHOICES_ITEMS = []
 		this.CHOICES_DECK_BUTTONS = []
 		this.CHOICES_DECK_SWITCHES = []
 		this.CHOICES_SHORTCUTS = []
@@ -43,11 +50,6 @@ class cuezAutomatorInstance extends InstanceBase {
 
 	async destroy() {
 		let self = this
-
-		if (self.INTERVAL) {
-			clearInterval(self.INTERVAL)
-			self.INTERVAL = null
-		}
 	}
 
 	async init(config) {
@@ -62,6 +64,7 @@ class cuezAutomatorInstance extends InstanceBase {
 		}
 
 		this.initConnection()
+		this.initWebSocket()
 
 		this.initActions()
 		this.initFeedbacks()
@@ -69,7 +72,17 @@ class cuezAutomatorInstance extends InstanceBase {
 		this.initPresets()
 
 		this.checkFeedbacks()
-		this.checkVariables()
+	}
+
+	maybeReconnect() {
+		if (this.isInitialized) {
+			if (this.reconnect_timer) {
+				clearTimeout(this.reconnect_timer)
+			}
+			this.reconnect_timer = setTimeout(() => {
+				this.initWebSocket()
+			}, 5000)
+		}
 	}
 }
 

@@ -108,6 +108,104 @@ module.exports = {
 			],
 		}
 
+		presets['trigger_first_block'] = {
+			category: 'Navigation',
+			name: `Trigger First Item`,
+			type: 'button',
+			style: {
+				text: 'Trigger First Item',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'next_first_block',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
+		presets['unload_episode'] = {
+			category: 'Episodes',
+			name: `Unload Episode`,
+			type: 'button',
+			style: {
+				text: 'Unload Episode',
+				size: '14',
+				color: foregroundColor,
+				bgcolor: foregroundColorBlack,
+			},
+			feedbacks: [],
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'unload_episode',
+							options: {},
+						},
+					],
+					up: [],
+				},
+			],
+		}
+
+		for (const project of this.CHOICES_PROJECTS) {
+			presets[`select_project_${project.label}`] = {
+				category: 'Projects',
+				name: `Select Project ${project.label}`,
+				type: 'button',
+				style: {
+					text: `Select Project: ${project.label}`,
+					color: foregroundColor,
+					bgcolor: foregroundColorBlack,
+				},
+				feedbacks: [],
+				steps: [
+					{
+						down: [
+							{
+								actionId: 'select_project',
+								options: { project: project.id },
+							},
+						],
+						up: [],
+					},
+				],
+			}
+		}
+
+		for (const rundown of this.CHOICES_RUNDOWNS) {
+			presets[`select_episode_${rundown.label}`] = {
+				category: 'Episodes',
+				name: `Select Episode ${rundown.label}`,
+				type: 'button',
+				style: {
+					text: `Select Episode: ${rundown.label}`,
+					color: foregroundColor,
+					bgcolor: foregroundColorBlack,
+				},
+				feedbacks: [],
+				steps: [
+					{
+						down: [
+							{
+								actionId: 'select_episode',
+								options: { episode: rundown.id },
+							},
+						],
+						up: [],
+					},
+				],
+			}
+		}
+
 		// TODO(Peter): Retest on later automator
 		/*for (const macro of this.CHOICES_MACROS) {
 			presets[`fire_macro_${macro.label}`] = {

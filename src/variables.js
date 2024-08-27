@@ -1,29 +1,52 @@
 module.exports = {
 	initVariables: function () {
-		let self = this
-
 		let variables = []
 
-		variables.push({ variableId: 'powerState', name: 'Power State' })
-		variables.push({ variableId: 'muteState', name: 'Mute State' })
-		variables.push({ variableId: 'volumeLevel', name: 'Current Volume Level' })
-		variables.push({ variableId: 'input', name: 'Current Input' })
+		variables.push({
+			name: 'Automator ID',
+			variableId: 'automator_id',
+		})
 
-		self.setVariableDefinitions(variables)
-	},
+		variables.push({
+			name: 'Automator Name',
+			variableId: 'automator_name',
+		})
 
-	checkVariables: function () {
-		let self = this
+		variables.push({
+			name: 'Automator Version',
+			variableId: 'automator_version',
+		})
 
-		try {
-			self.setVariableValues({
-				powerState: self.DATA.powerState ? 'On' : 'Off',
-				muteState: self.DATA.muteState ? 'Muted' : 'Unmuted',
-				volumeLevel: self.DATA.volumeLevel,
-				input: self.DATA.input,
-			})
-		} catch (error) {
-			self.log('error', 'Error setting variables: ' + error)
-		}
+		variables.push({
+			name: 'Automator State',
+			variableId: 'automator_state',
+		})
+
+		variables.push({
+			name: 'Project ID',
+			variableId: 'project_id',
+		})
+
+		variables.push({
+			name: 'Project Title',
+			variableId: 'project_title',
+		})
+
+		variables.push({
+			name: 'Project Pairing Expired',
+			variableId: 'project_pairing_expired',
+		})
+
+		variables.push({
+			name: 'Episode ID',
+			variableId: 'episode_id',
+		})
+
+		variables.push({
+			name: 'Episode Title',
+			variableId: 'episode_title',
+		})
+
+		this.setVariableDefinitions(variables)
 	},
 }
