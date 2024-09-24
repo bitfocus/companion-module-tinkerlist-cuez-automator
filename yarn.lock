@@ -301,15 +301,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@companion-module/base@~1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@companion-module/base/-/base-1.10.0.tgz#fbfe5822422f30c6e4ad04dc2e4e0559a8166571"
-  integrity sha512-ij5eBISaSwr0lfNwNDLB52jYaY66Kna0I6BdbwtCm634XeZtbm3n1gYyUSUdzJQ6z97ImbIKJPIKEn6laxCGxA==
+"@companion-module/base@~1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@companion-module/base/-/base-1.11.0.tgz#26ef06a9cf5edc9c7057043600dc5a7ad7ec2f23"
+  integrity sha512-SJvpAaZb6zSQQ6ub055criM6Frku5nzyN9F6OUrq/xjqbaqmf+xQtAJyiIMkfcIHfuE5EXv3hYWCZbwQSCrIoQ==
   dependencies:
     ajv "^8.17.1"
     colord "^2.9.3"
     ejson "^2.2.3"
-    eventemitter3 "^4.0.7"
+    eventemitter3 "^5.0.1"
     mimic-fn "^3.1.0"
     nanoid "^3.3.7"
     p-queue "^6.6.2"
@@ -1528,10 +1528,15 @@ event-stream@=3.3.4:
     stream-combiner "~0.0.4"
     through "~2.3.1"
 
-eventemitter3@^4.0.4, eventemitter3@^4.0.7:
+eventemitter3@^4.0.4:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 events@^3.2.0:
   version "3.3.0"
