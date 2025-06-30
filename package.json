@@ -19,7 +19,7 @@
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^2.0.4",
-		"jest": "^29.7.0",
+		"jest": "^30.0.3",
 		"prettier": "^3.6.2"
 	}
 }
