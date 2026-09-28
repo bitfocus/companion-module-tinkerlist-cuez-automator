@@ -1,25 +1,37 @@
 {
 	"name": "tinkerlist-cuez-automator",
-	"version": "1.0.0",
-	"main": "index.js",
+	"version": "2.0.0",
+	"main": "dist/main.js",
+	"type": "module",
 	"scripts": {
 		"format": "prettier -w .",
-		"test": "jest --silent=false"
+		"package": "yarn build && companion-module-build",
+		"build": "rimraf dist && tsc -p tsconfig.build.json",
+		"dev": "tsc -p tsconfig.build.json --watch",
+		"lint": "eslint .",
+		"test": "node --experimental-strip-types test/cuez.test.ts"
 	},
+	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/bitfocus/companion-module-tinkerlist-cuez-automator.git"
 	},
-	"license": "MIT",
-	"prettier": "@companion-module/tools/.prettierrc.json",
+	"engines": {
+		"node": "^22.20",
+		"yarn": "^4"
+	},
 	"dependencies": {
-		"@companion-module/base": "~1.10.0",
-		"node-rest-client": "^3.1.1",
-		"ws": "^8.21.3"
+		"@companion-module/base": "~2.0.4"
 	},
 	"devDependencies": {
-		"@companion-module/tools": "^2.8.0",
-		"jest": "^30.5.2",
-		"prettier": "^3.9.9"
-	}
+		"@companion-module/tools": "^3.1.0",
+		"@types/node": "^22.19.17",
+		"eslint": "^9.39.4",
+		"prettier": "^3.8.3",
+		"rimraf": "^6.1.3",
+		"typescript": "~6.0.3",
+		"typescript-eslint": "^8.59.0"
+	},
+	"prettier": "@companion-module/tools/.prettierrc.json",
+	"packageManager": "yarn@4.17.0"
 }

@@ -1,8 +1,10 @@
 {
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+	"type": "connection",
 	"id": "tinkerlist-cuez-automator",
-	"name": "tinkerlist-cuez-automator",
-	"shortname": "cuez-automator",
-	"description": "",
+	"name": "Cuez Automator",
+	"shortname": "cuez",
+	"description": "Control Cuez Automator: rundown, deck buttons, macros, timers, prompter and episodes, with live current / next block feedback",
 	"version": "0.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-tinkerlist-cuez-automator.git",
@@ -10,16 +12,20 @@
 	"maintainers": [
 		{
 			"name": "Peter Newman"
+		},
+		{
+			"name": "Max Blaauw",
+			"email": "max.blaauw@tinkerlist.tv"
 		}
 	],
-	"legacyIds": [],
 	"runtime": {
-		"type": "node18",
+		"type": "node22",
 		"api": "nodejs-ipc",
 		"apiVersion": "0.0.0",
-		"entrypoint": "../index.js"
+		"entrypoint": "../dist/main.js"
 	},
-	"manufacturer": "TinkerList",
-	"products": ["Cuez - Automator"],
-	"keywords": ["Running Order"]
+	"legacyIds": [],
+	"manufacturer": "Cuez",
+	"products": ["Automator"],
+	"keywords": ["TinkerList", "rundown", "running order", "broadcast", "prompter"]
 }
